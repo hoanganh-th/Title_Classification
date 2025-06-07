@@ -37,5 +37,4 @@ def data_load(file_path):
             processed_labels.append(0)  # Default to first category
 
     return titles, np.array(processed_labels), dict_labels
-if __name__ == "__main__":
-    titles, labels, dict_labels = data_load(file_path)
+
