@@ -39,7 +39,7 @@ def data_load(file_path):
     return titles, np.array(processed_labels), dict_labels
 
 def clean_data(titles):
-    """Clean the news title data"""
+
     # Chuyen cac gia tri NaN thanh chuoi rong
     titles = titles.fillna('').astype(str)
 
