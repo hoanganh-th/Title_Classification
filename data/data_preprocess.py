@@ -24,3 +24,12 @@ def encode_titles_for_bert(titles, tokenizer, max_length=128):
     attention_masks = encoded_data['attention_mask']
 
     return input_ids, attention_masks
+
+# Tao tap du lieu TensorDataset cho BERT
+def create_bert_dataset(input_ids, attention_masks, labels):
+    """Create TensorDataset for BERT inputs"""
+    return torch.utils.data.TensorDataset(
+        input_ids,
+        attention_masks,
+        torch.tensor(labels, dtype=torch.long)
+    )
