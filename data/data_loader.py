@@ -7,7 +7,7 @@ import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-file_path= 'News Title.xls'
+
 def data_load(file_path):
     df = pd.read_excel(file_path)
     title_column = 'News Title'
