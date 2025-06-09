@@ -1,6 +1,6 @@
 import torch
 from transformers import BertTokenizer
-from data_loader import data_load, clean_data
+from data.data_loader import data_load, clean_data
 from sklearn.model_selection import train_test_split
 import logging
 
