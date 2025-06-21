@@ -20,7 +20,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Siêu tham số
 batch_size = 64
-epochs = 3
+epochs = 4
 max_length = 32
 learning_rate = 2e-5
 
@@ -38,8 +38,8 @@ def evaluate(model, val_dataloader):
     with torch.no_grad():
         for batch in val_dataloader:
             input_ids, attention_masks, labels = [item.to(device) for item in batch]
-
             outputs = model(input_ids, attention_mask=attention_masks, labels=labels)
+
             loss = outputs.loss
             logits = outputs.logits
 
@@ -53,10 +53,11 @@ def evaluate(model, val_dataloader):
     return acc, avg_loss, val_preds, val_labels
 
 
-def plot_metrics(train_loss_list, val_loss_list, val_acc_list):
+def plot_metrics(train_loss_list, val_loss_list, train_acc_list, val_acc_list):
     epochs_range = range(1, len(train_loss_list) + 1)
     plt.figure(figsize=(12, 5))
 
+    # Plot Loss
     plt.subplot(1, 2, 1)
     plt.plot(epochs_range, train_loss_list, label='Train Loss')
     plt.plot(epochs_range, val_loss_list, label='Validation Loss')
@@ -65,9 +66,11 @@ def plot_metrics(train_loss_list, val_loss_list, val_acc_list):
     plt.ylabel('Loss')
     plt.legend()
 
+    # Plot Accuracy
     plt.subplot(1, 2, 2)
+    plt.plot(epochs_range, train_acc_list, label='Train Accuracy')
     plt.plot(epochs_range, val_acc_list, label='Validation Accuracy')
-    plt.title('Validation Accuracy per Epoch')
+    plt.title('Accuracy per Epoch')
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy')
     plt.legend()
@@ -96,7 +99,10 @@ def main():
     optimizer = AdamW(model.parameters(), lr=learning_rate, eps=1e-8)
 
     best_val_acc = 0.0
+
+    # Lưu lịch sử để vẽ
     train_loss_list = []
+    train_acc_list = []
     val_loss_list = []
     val_acc_list = []
 
@@ -105,6 +111,8 @@ def main():
         logger.info(f"Epoch {epoch + 1}/{epochs}")
         model.train()
         total_loss = 0
+        correct_predictions = 0
+        total_predictions = 0
 
         for batch in tqdm(train_dataloader, desc=f"Epoch {epoch + 1}"):
             input_ids, attention_masks, labels = [item.to(device) for item in batch]
@@ -112,19 +120,28 @@ def main():
             model.zero_grad()
             outputs = model(input_ids, attention_mask=attention_masks, labels=labels)
             loss = outputs.loss
+            logits = outputs.logits
+
             total_loss += loss.item()
+
+            predictions = torch.argmax(logits, dim=1)
+            correct_predictions += (predictions == labels).sum().item()
+            total_predictions += labels.size(0)
 
             loss.backward()
             optimizer.step()
 
         avg_train_loss = total_loss / len(train_dataloader)
+        train_accuracy = correct_predictions / total_predictions
         train_loss_list.append(avg_train_loss)
+        train_acc_list.append(train_accuracy)
 
         val_acc, val_loss, val_preds, val_labels = evaluate(model, val_dataloader)
         val_loss_list.append(val_loss)
         val_acc_list.append(val_acc)
 
-        logger.info(f"Train Loss: {avg_train_loss:.4f} | Val Loss: {val_loss:.4f} | Val Accuracy: {val_acc:.4f}")
+        logger.info(f"Train Loss: {avg_train_loss:.4f} | Train Accuracy: {train_accuracy:.4f} | "
+                    f"Val Loss: {val_loss:.4f} | Val Accuracy: {val_acc:.4f}")
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
@@ -135,12 +152,11 @@ def main():
     tokenizer.save_pretrained(save_path)
     logger.info("Final model & tokenizer saved to 'saved_model/'")
 
-    # Đánh giá trực quan
-    label_names = list(dict_labels.keys())
-
     logger.info("Plotting metrics...")
-    plot_metrics(train_loss_list, val_loss_list, val_acc_list)
+    plot_metrics(train_loss_list, val_loss_list, train_acc_list, val_acc_list)
 
+    # Confusion matrix
+    label_names = list(dict_labels.keys())
     cm = confusion_matrix(val_labels, val_preds)
     plt.figure()
     plot_confusion_matrix(cm, figsize=(8, 6), hide_ticks=True, cmap=plt.cm.Blues)
