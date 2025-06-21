@@ -101,6 +101,6 @@ def clean_shortforms(text):
     return clean_text
 
 def clean_symbol(text):
-    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
     text = re.sub(r'\s+', ' ', text).strip()
     return text
