@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Siêu tham số
-batch_size = 128
+batch_size = 64
 epochs = 1
-max_length = 64
+max_length = 32
 learning_rate = 2e-5
 
 # Đường dẫn dữ liệu và nơi lưu mô hình
