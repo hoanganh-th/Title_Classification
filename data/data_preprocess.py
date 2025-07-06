@@ -45,7 +45,7 @@ def preprocess_for_bert(file_path, test_size=0.2, max_length=64):
 
     # Split data
     logger.info("Splitting data...")
-    X_train, X_val, y_train, y_val = train_test_split(titles, labels, test_size=test_size, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(titles, labels, test_size=test_size, random_state=42, stratify=labels)
 
     # Tokenizer
     logger.info("Loading BERT tokenizer...")
