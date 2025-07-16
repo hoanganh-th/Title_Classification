@@ -7,7 +7,7 @@ import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-file_path= 'News Title.xls'
+
 def data_load(file_path):
     df = pd.read_excel(file_path)
     title_column = 'News Title'
@@ -101,6 +101,6 @@ def clean_shortforms(text):
     return clean_text
 
 def clean_symbol(text):
-    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
     text = re.sub(r'\s+', ' ', text).strip()
     return text

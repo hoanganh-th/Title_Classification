@@ -1,6 +1,6 @@
 import torch
 from transformers import BertTokenizer
-from data_loader import data_load, clean_data
+from data.data_loader import data_load, clean_data
 from sklearn.model_selection import train_test_split
 import logging
 
@@ -45,7 +45,7 @@ def preprocess_for_bert(file_path, test_size=0.2, max_length=64):
 
     # Split data
     logger.info("Splitting data...")
-    X_train, X_val, y_train, y_val = train_test_split(titles, labels, test_size=test_size, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(titles, labels, test_size=test_size, random_state=42, stratify=labels)
 
     # Tokenizer
     logger.info("Loading BERT tokenizer...")
