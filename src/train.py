@@ -90,8 +90,8 @@ def main():
     model = BertForSequenceClassification.from_pretrained(
         'bert-base-uncased',
         num_labels=len(dict_labels),
-        output_attentions=False,
-        output_hidden_states=False
+        output_attentions=False,    # Không cần xuất vector attention
+        output_hidden_states=False  # Không cần xuất trạng thái ẩn
     )
     model.to(device)
 
